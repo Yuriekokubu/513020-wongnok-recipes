@@ -18,7 +18,7 @@ Install wongnok-recipes with npm
     
 ## My Web Application
 
-Visit Website Here: [wongnok.fly.dev](wongnok.fly.dev/)
+Visit Website Here: https://wongnok.fly.dev/
 
 
 

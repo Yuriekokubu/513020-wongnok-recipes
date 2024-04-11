@@ -1,0 +1,461 @@
+<section class="section about-section gray-bg" id="about">
+    <div class="container">
+        <div class="row align-items-center flex-row-reverse">
+            <div class="col-lg-6">
+                <div class="about-text go-to">
+                    <h3 class="dark-color">
+                        <%= user.name %>'s Profile
+                    </h3>
+                    <% if(user && user.description ) {%>
+                        <p>
+                            <%= user.description %>
+                        </p>
+                        <% } else { %>
+                            <p>I am a home baker. My passion is to design digital user experiences through the bold
+                                interface and meaningful interactions.</p>
+                            <% } %>
+
+                                <div class="row about-list">
+                                    <div class="col-md-6">
+                                        <div class="media">
+                                            <label>Name</label>
+                                            <p>
+                                                <%= user.name %>
+                                            </p>
+                                        </div>
+                                        <div class="media">
+                                            <label>Since</label>
+                                            <p>
+                                                <%= user.createdAt.toDateString() %>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="media">
+                                            <label>E-mail</label>
+                                            <p>
+                                                <%= user.email %>
+                                            </p>
+                                        </div>
+                                        <div class="media">
+                                            <label>Recipes</label>
+                                            <p>
+                                                <%= count %>&nbsp;
+                                                    <% if(count !='' && count> 0) { %>
+                                                        <i class="bi bi-eye-fill" onclick="showrecipe()"></i>
+                                                        <% } %>
+                                                            <!-- <button type="button" data-toggle="modal" data-target="#exampleModal"><i class="bi bi-eye-fill"></i></button> -->
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div id="mtable" style="display:none">
+                                        <div id="Grid">
+                                            <table class="table mt-5">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">S.No</th>
+                                                        <th scope="col">Recipe</th>
+                                                        <th scope="col">Item</th>
+                                                        <th scope="col">Category</th>
+                                                        <th scope="col">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% if(recipe !='' ) { %>
+                                                        <% recipe.forEach(function(item,index){ %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= index+1 %>
+                                                                </td>
+                                                                <td>
+                                                                    <img style="width:70px;height:70px"
+                                                                        src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%- item.image %>"
+                                                                        alt="">
+                                                                </td>
+                                                                <td>
+                                                                    <%= item.name %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= item.category %>
+                                                                </td>
+
+                                                                <td>
+                                                                    <button class="btn btn-warning"
+                                                                        onclick="viewList('<%= item._id %>')"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#viewModal">
+                                                                        <i class="bi bi-view-list"></i>
+                                                                    </button>
+
+                                                                    <button class="btn btn-success"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#editModal<%= item._id %>">
+                                                                        <i class="bi bi-pen"></i>
+                                                                    </button>
+
+                                                                    <button class="btn btn-danger"
+                                                                        onclick="removeList('<%= item._id %>')">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
+                                                                    <div class="modal fade"
+                                                                        id="editModal<%= item._id %>" tabindex="-1"
+                                                                        aria-labelledby="editModallabel"
+                                                                        aria-hidden="true">
+                                                                        <div
+                                                                            class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                                                            <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title"
+                                                                                        id="editModallabel">Edit Your
+                                                                                        Recipe</h5>
+                                                                                    <button type="button"
+                                                                                        class="btn-close"
+                                                                                        data-bs-dismiss="modal"
+                                                                                        aria-label="Close"></button>
+                                                                                </div>
+                                                                                <div class="modal-body"
+                                                                                    id="modaleditbody">
+
+                                                                                    <div
+                                                                                        class="row justify-content-center">
+                                                                                        <form
+                                                                                            action="/editList/<%= item._id %>"
+                                                                                            method="post"
+                                                                                            enctype="multipart/form-data"
+                                                                                            onsubmit="return handleSubmit()">
+                                                                                            <div class="row g-3">
+                                                                                                <div class="col-6">
+                                                                                                    <label for="name"
+                                                                                                        class="form-label">Recipe</label>
+                                                                                                    <input type="text"
+                                                                                                        name="name"
+                                                                                                        id="name"
+                                                                                                        class="form-control"
+                                                                                                        value="<%= item.name %>"
+                                                                                                        autocomplete="off">
+                                                                                                </div>
+
+                                                                                                <div class="col-12">
+                                                                                                    <label
+                                                                                                        for="description"
+                                                                                                        class="form-label">Description</label>
+                                                                                                    <textarea
+                                                                                                        name="description"
+                                                                                                        id="description"
+                                                                                                        class="form-control"
+                                                                                                        cols="30"
+                                                                                                        rows="4"
+                                                                                                        autocomplete="off"><%= item.description %></textarea>
+                                                                                                </div>
+
+                                                                                                <div class="col-12">
+                                                                                                    <label
+                                                                                                        for="Ingredients"
+                                                                                                        class="form-label">Ingredients</label>
+                                                                                                    <input type="text"
+                                                                                                        name="ingredients"
+                                                                                                        id="ingredients"
+                                                                                                        class="form-control"
+                                                                                                        value="<%= item.ingredients%>"
+                                                                                                        autocomplete="off">
+                                                                                                </div>
+
+                                                                                                <div class="col-12">
+                                                                                                    <label
+                                                                                                        for="instructions"
+                                                                                                        class="form-label">Instructions</label>
+                                                                                                    <textarea
+                                                                                                        name="instructions"
+                                                                                                        id="instructions"
+                                                                                                        class="form-control"
+                                                                                                        cols="30"
+                                                                                                        rows="4"><%= item.instructions %></textarea>
+                                                                                                </div>
+
+                                                                                                <div class="col-12">
+                                                                                                    <label
+                                                                                                        for="duration"
+                                                                                                        class="form-label">Duration</label>
+                                                                                                    <!-- Input element with type range -->
+                                                                                                    <input type="range"
+                                                                                                        name="duration"
+                                                                                                        id="duration<%= index+1 %>"
+                                                                                                        class="form-range"
+                                                                                                        min="0"
+                                                                                                        max="120"
+                                                                                                        step="1"
+                                                                                                        required
+                                                                                                        onchange="handleInputChange(<%= index+1 %>)">
+
+                                                                                                    <output
+                                                                                                        for="duration<%= index+1 %>"
+                                                                                                        id="durationOutput<%= index+1 %>"></output>
+                                                                                                    <output
+                                                                                                        id="fetchOP<%= index+1 %>">
+                                                                                                        <%= item.duration
+                                                                                                            %> minutes
+                                                                                                    </output>
+                                                                                                </div>
+                                                                                                <div class="col-12">
+                                                                                                    <label
+                                                                                                        for="category">Category</label>
+                                                                                                    <select
+                                                                                                        class="form-select form-control"
+                                                                                                        name="category"
+                                                                                                        aria-label="Category"
+                                                                                                        value="<%= item.category %>">
+                                                                                                        <option
+                                                                                                            selected>
+                                                                                                            <%= item.category
+                                                                                                                %>
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="Thai">
+                                                                                                            Thai
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="American">
+                                                                                                            American
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="Chineese">
+                                                                                                            Chineese
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="Mexican">
+                                                                                                            Mexican
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="Indian">
+                                                                                                            Indian
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="Indian">
+                                                                                                            Italian
+                                                                                                        </option>
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                                <div class="col-12">
+                                                                                                    <label
+                                                                                                        for="image">Image</label>
+                                                                                                    <div
+                                                                                                        class='col-md-2'>
+                                                                                                        <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%= item.image %>"
+                                                                                                            alt="image"
+                                                                                                            loading="lazy"
+                                                                                                            width="80px"
+                                                                                                            height="80px">
+                                                                                                    </div>
+                                                                                                    <input type="file"
+                                                                                                        class="form-control"
+                                                                                                        name="image"
+                                                                                                        accept="image/*">
+                                                                                                </div>
+
+                                                                                                <div class="col-12">
+                                                                                                    <button
+                                                                                                        type="submit"
+                                                                                                        class="btn btn-primary"
+                                                                                                        id="editsubmit"
+                                                                                                        onclick="return handleSubmit('<%= item._id %>')">Edit</button>
+
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <!-- Modal -->
+                                                            <div class="modal fade" id="successModal<%= item._id %>"
+                                                                tabindex="-1"
+                                                                aria-labelledby="successModalLabel<%= item._id %>"
+                                                                aria-hidden="true">
+                                                                <div class="modal-dialog modal-dialog-centered">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title"
+                                                                                id="successModalLabel<%= item._id %>">
+                                                                                Success</h5>
+                                                                            <button type="button" class="btn-close"
+                                                                                data-bs-dismiss="modal"
+                                                                                aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            Your edit was successful.
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <% }) %>
+
+                                                                <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="about-avatar">
+                    <% if(user && user.image ) { %>
+                        <img id="previewImage"
+                            src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%= user.image %>"
+                            alt="image" loading="lazy" width="300px" height="300px">
+                        <% } else { %>
+                            <img id="previewImage" src="https://cdn-icons-png.flaticon.com/256/456/456283.png"
+                                width="200px" title="avatar" alt="avatar">
+                            <% } %>
+                </div>
+                <br>
+                <form method="post" action="/profile" enctype="multipart/form-data">
+                    <input type="file" id="imageInput" name="image" accept="image/*" onchange="previewFile()" required>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewModalLabel">View Recipe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalviewbody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function showrecipe() {
+        document.getElementById("mtable").style.display = "block";
+    }
+    function viewList(id) {
+        $.ajax({
+            url: '/viewList/' + id,
+            method: 'get',
+            success: (response) => {
+                if (response.status) {
+                    var html = '';
+                    if (response.result.length > 0) {
+                        html += `
+                        <div class='container'>
+                            <div class='row'>
+                                <div class='col-md-8'>
+                                    <h4 class='resulttitle'>Recipe ID: <span class='resultspan'>`+ response.result[0]._id + `</span></h4>
+                                    <h4 class='resulttitle'>Item: <span class='resultspan'>`+ response.result[0].name + `</span></h4>
+                                    <h4 class='resulttitle'>Description: <span class='resultspan'>`+ response.result[0].description + `</span></h4>
+                                    <h4 class='resulttitle'>Category: <span class='resultspan'>`+ response.result[0].category + `</span> </h4>
+                                    <h4 class='resulttitle'>Ingredients: <span class='resultspan'>`+ response.result[0].ingredients.join(',') + `</span></h4>
+                                    <h4 class='resulttitle'>Instructions: <span class='resultspan'>`+ response.result[0].instructions + `</span></h4>
+                                </div>
+                                <div class='col-md-2'>
+                                    <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/`+ response.result[0].image + `" alt="image" loading="lazy" width="200px" height="200px">
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }
+
+                    $('#modalviewbody').html(html);
+
+
+                }
+                else {
+                    alert("Something went wrong");
+                }
+            }
+
+        });
+    }
+
+
+    function removeList(id) {
+
+        $.ajax({
+            url: '/deleteList/' + id,
+            method: 'delete',
+            success: (response) => {
+                if (response.status) {
+                    location.reload();
+                }
+                else {
+                    alert("Something went wrong");
+                }
+            }
+        });
+
+    }
+
+    const durationOutput = document.getElementById('durationOutput');
+    const fetchOP = document.getElementById('fetchOP');
+    const durationInput = document.getElementById('duration');
+
+    // Function to handle input change event
+    function handleInputChange(index) {
+        // Get the duration value from the input field
+        var durationValue = document.getElementById('duration' + index).value;
+
+        // Hide fetchOP and show durationOutput
+        document.getElementById('fetchOP' + index).style.display = 'none';
+        document.getElementById('durationOutput' + index).style.display = 'block';
+
+        // Update the value in durationOutput
+        document.getElementById('durationOutput' + index).textContent = durationValue + ' minutes';
+    }
+
+    // Function to reset visibility when the input field loses focus
+    function handleInputBlur(index) {
+        // Show fetchOP and hide durationOutput
+        document.getElementById('fetchOP' + index).style.display = 'block';
+        document.getElementById('durationOutput' + index).style.display = 'none';
+    }
+
+    function handleSubmit(itemId) {
+        // Perform form submission here
+        // For demonstration, I'm just showing the modal after a timeout
+        setTimeout(function () {
+            $('#successModal' + itemId).modal('show'); // Show the success modal
+            $('#editForm' + itemId).trigger('reset'); // Reset the form
+            $('#editModal' + itemId).modal('hide'); // Close the edit modal
+        }, 1000); // Adjust the timeout as needed
+        return false; // Prevent the form from submitting normally
+    }
+
+    function previewFile() {
+        const preview = document.getElementById('previewImage');
+        const fileInput = document.getElementById('imageInput');
+        const button = document.querySelector('.btn-primary'); // Select the upload button
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "https://cdn-icons-png.flaticon.com/256/456/456283.png";
+        }
+    }
+
+
+</script>

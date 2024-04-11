@@ -1,0 +1,178 @@
+<!-- <div class="row flex-lg-row-reverse align-items-center g-5 py-4 mb-4">
+    <div class="col-12 col-lg-6">
+        <img src="https://img.wongnai.com/p/1600x0/2022/05/26/21ee5614ed214a489b5e631d3ec82c49.jpg" alt="Cooking blog"
+            class="d-block mx-lg-auto img-fluid home-img" loading="lazy">
+    </div>
+    <div class="col-12 col-lg-6">
+        <h1 class="display-5 fw-bold mb-3">เรื่องอาหารไว้ใจวง(นอก)</h1>
+        <p style="text-align: justify;">
+            Wongnok รวมสูตรการทำอาหาร
+        </p>
+        <div class="d-grid d-md-flex justify-content-md-start">
+            <a href="/explore-latest" class="btn btn-primary btn-dark btn-lg px-4 me-md-2">ค้นหาล่าสุด</a>
+            <a href="/explore-random" class="btn btn-outline-secondary btn-light btn-lg px-4 me-md-2">สุ่มสูตร</a>
+        </div>
+    </div>
+</div> -->
+
+<div class="row flex-lg-row-reverse align-items-center g-5 py-4 mb-4 mt-1.5"
+    style="background-color: #0070a9;">
+    <div class="col-12 col-lg-6 position-relative">
+        <div style="background-color: rgba(0, 0, 0, 0.5); border-radius: 15px; padding: 20px;">
+            <h1 class="display-5 fw-bold mb-3" style="color: rgb(255, 255, 255);">เรื่องอาหารไว้ใจวง(นอก)</h1>
+            <p style="text-align: justify; color: rgb(255, 255, 255);">
+                วันนี้ทานอะไรดี ถามวงนอกสิ
+            </p>
+            <div class="d-grid d-md-flex justify-content-md-start">
+                <a href="/explore-latest" class="btn btn-primary btn-dark btn-lg px-4 me-md-2">ค้นหาล่าสุด</a>
+                <a href="/explore-random" class="btn btn-outline-secondary btn-light btn-lg px-4 me-md-2">สุ่มสูตร</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6 z-index-1">
+        <img src="https://i.ytimg.com/vi/rv3UxHZCy50/maxresdefault.jpg" alt="Cooking blog"
+            class="d-block mx-lg-auto img-fluid home-img fit-image" loading="lazy">
+    </div>
+</div>
+
+
+
+
+
+
+<div class="row row-cols-2 row-cols-lg-6 g-2 g-lg-3 py-4">
+
+    <% if(categories !='' ) { %>
+        <% categories.forEach(function(category, index) { %>
+            <a href="/categories/<%- category.name %>" class="col text-center category_link">
+                <div class="category_img shadow">
+                    <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/img/<%- category.image %>"
+                        alt="<%- category.name %>" loading="lazy">
+                </div>
+                <div class="pt-1">
+                    <h5>
+                        <%- category.name %>
+                    </h5>
+
+                    <!-- <% if(userName){ %>
+                        <%- userName %>
+                    <% } %> -->
+                </div>
+            </a>
+            <% }) %>
+                <% } %>
+
+                    <a href="/categories" class="col text-center text-decoration-none">
+                        <br>
+                        <div class="pt-1">View All</div>
+                    </a>
+</div>
+
+<!-- latest start -->
+<section class="pb-4 pt-4">
+    <div class="d-flex mb-2 align-items-center">
+        <h2>Latest Recipes</h2>
+        <a href="/explore-latest" class="ms-auto">View More</a>
+    </div>
+    <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
+        <% if(food !='' ) { %>
+            <% food.latest.forEach(function(recipe, index){ %>
+                <a href="/recipe/<%= recipe._id %>" class="col text-center category_link">
+                    <div class="category_img--large shadow">
+                        <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%= recipe.image %>"
+                            alt="<%= recipe.name %>" loading="lazy">
+                    </div>
+                    <div class="pt-1">
+                        <h5>
+                            <%= recipe.name %>
+                        </h5>
+                    </div>
+                </a>
+                <% }) %>
+                    <% } else { %>
+                        <p>No items found.</p>
+                        <% } %>
+    </div>
+</section>
+<!-- latest end -->
+
+
+<% const renderRecipes=(recipes, cuisine)=> { %>
+    <% if (recipes && recipes.length> 0) { %>
+        <% recipes.forEach(function(recipe) { %>
+            <a href="/recipe/<%= recipe._id %>" class="col text-center category_link">
+                <div class="category_img--large shadow">
+                    <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%= recipe.image %>"
+                        alt="<%= recipe.name %>" loading="lazy">
+                </div>
+                <div class="pt-1">
+                    <h5>
+                        <%= recipe.name %>
+                    </h5>
+                </div>
+            </a>
+            <% }) %>
+                <% } else { %>
+                    <!-- No items found for <%= cuisine %> cuisine. -->
+                    <% } %>
+                        <% } %>
+
+                            <% if (food.thai && food.thai.length> 0) { %>
+                                <section class="pb-4 pt-4">
+                                    <div class="d-flex mb-2 align-items-center">
+                                        <h2>Thai Recipes</h2>
+                                        <a href="/categories/Thai" class="ms-auto">View More</a>
+                                    </div>
+                                    <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
+                                        <% renderRecipes(food.thai, 'Thai' ) %>
+                                    </div>
+                                </section>
+                                <% } %>
+
+                                    <% if (food.indian && food.indian.length> 0) { %>
+                                        <section class="pb-4 pt-4">
+                                            <div class="d-flex mb-2 align-items-center">
+                                                <h2>Indian Recipes</h2>
+                                                <a href="/categories/Indian" class="ms-auto">View More</a>
+                                            </div>
+                                            <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
+                                                <% renderRecipes(food.indian, 'Indian' ) %>
+                                            </div>
+                                        </section>
+                                        <% } %>
+
+                                            <% if (food.chineese && food.chineese.length> 0) { %>
+                                                <section class="pb-4 pt-4">
+                                                    <div class="d-flex mb-2 align-items-center">
+                                                        <h2>Chinese Recipes</h2>
+                                                        <a href="/categories/Chinese" class="ms-auto">View More</a>
+                                                    </div>
+                                                    <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
+                                                        <% renderRecipes(food.chineese, 'Chinese' ) %>
+                                                    </div>
+                                                </section>
+                                                <% } %>
+
+                                                    <!-- latest end -->
+
+                                                    <!-- submit start -->
+                                                    <section class="px-4 py-5 my-5 text-center">
+                                                        <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/img/b0.webp"
+                                                            alt="Publish your recipe for free today"
+                                                            class="d-block mx-auto mb-4 img-fluid" loading="lazy"
+                                                            width="566" height="208">
+                                                        <h1 class="display-5 fw-bold">Publish your recipe for FREE today
+                                                        </h1>
+                                                        <div class="col-lg-6 mx-auto">
+                                                            <p class="lead mb-4">Publish your recipe in front of
+                                                                thousands of people for free</p>
+                                                            <div
+                                                                class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                                                <a href="/submit-recipe"
+                                                                    class="btn btn-primary btn-dark btn-lg">Submit
+                                                                    Recipe</a>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                    <!-- submit-end -->
+                                                    

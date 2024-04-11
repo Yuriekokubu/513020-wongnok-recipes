@@ -1,0 +1,155 @@
+<h1 class="pb-4">All recipes</h1>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" style="text-decoration: none;">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Recipes</li>
+    </ol>
+</nav>
+
+<div class="container mt-2">
+    <div class="row align-items-center">
+        <div class="col-md-6 px-0">
+            <!-- Label for the select dropdown -->
+            <label for="rating" class="form-label mb-0">Select Rating:</label>
+            <!-- Bootstrap styled select dropdown -->
+            <select id="rating" class="form-select mb-1">
+                <option value="">ALL</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+                <!-- Add more options as needed -->
+            </select>
+            <label for="duration" class="form-label">Duration <output for="duration" id="durationOutput">0
+                    minutes</output></label><br>
+            <input type="range" name="duration" id="duration" class="form-range mb-5" min="0" max="120" step="1"
+                style="width: 50%;" required>
+        </div>
+    </div>
+</div>
+
+<div id="results"></div>
+
+<div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3" id="recipeList">
+    <!-- Recipe items will be dynamically added here -->
+</div>
+
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', fetchData);
+
+    document.getElementById('rating').addEventListener('change', handleRatingChange);
+
+    async function fetchData() {
+        try {
+            const response = await fetch('/getAllRecipes');
+            const data = await response.json();
+            renderRecipes(data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    async function handleRatingChange() {
+        const minRating = document.getElementById('rating').value;
+
+        // If "ALL" is selected, fetch all recipes
+        if (minRating === '') {
+            try {
+                const response = await fetch('/getAllRecipes');
+                const data = await response.json();
+                renderRecipes(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        } else {
+            // If a specific rating is selected, fetch filtered recipes
+            try {
+                const response = await fetch(`/filterByRating/${minRating}`);
+                const data = await response.json();
+                renderRecipes(data);
+            } catch (error) {
+                console.error('Error fetching filtered data:', error);
+            }
+        }
+    }
+
+    function renderRecipes(recipes) {
+        const recipeList = document.getElementById('recipeList');
+        recipeList.innerHTML = '';
+
+        if (recipes.length > 0) {
+            recipes.forEach(recipeItem => {
+                const recipeLink = document.createElement('a');
+                recipeLink.href = `/recipe/${recipeItem._id}`;
+                recipeLink.className = 'col text-center category_link';
+
+                const categoryImgContainer = document.createElement('div');
+                categoryImgContainer.className = 'category_img category_img--large shadow';
+
+                const img = document.createElement('img');
+                img.src = `https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/${recipeItem.image}`;
+                img.alt = recipeItem.name;
+                img.loading = 'lazy';
+
+                categoryImgContainer.appendChild(img);
+
+                const nameElement = document.createElement('div');
+                nameElement.className = 'pt-1';
+                nameElement.textContent = recipeItem.name;
+
+                recipeLink.appendChild(categoryImgContainer);
+                recipeLink.appendChild(nameElement);
+
+                recipeList.appendChild(recipeLink);
+            });
+        } else {
+            recipeList.innerHTML = '<p>No items found.</p>';
+        }
+    }
+
+    const durationInput = document.getElementById('duration');
+    const durationOutput = document.getElementById('durationOutput');
+
+    let timeoutId;
+
+    durationInput.addEventListener('input', function () {
+        durationOutput.textContent = `${this.value} minutes`;
+
+        // Clear the previous timeout
+        clearTimeout(timeoutId);
+
+        // Set a new timeout to wait for 3 seconds before sending the POST request
+        timeoutId = setTimeout(() => {
+            // Construct the URL with the duration value as a query parameter
+            const url = `/filterByDuration/${this.value}`;
+
+            // Show the loading overlay
+            loadingOverlay.style.display = 'flex';
+
+            // Send a POST request to the URL
+            fetch(url, {
+                method: 'POST',
+                // Add any additional options like headers or body as needed
+            })
+                .then(response => response.json()) // Parse the response as JSON
+                .then(data => {
+                    // Call the renderRecipes function with the data received from the server
+                    renderRecipes(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                }).finally(() => {
+                    // Hide the loading overlay once the request is completed
+                    loadingOverlay.style.display = 'none';
+                });
+        }, 1000); // 3 seconds
+    });
+    // Initial fetch on page load
+    fetchData();
+</script>

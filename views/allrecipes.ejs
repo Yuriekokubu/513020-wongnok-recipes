@@ -7,12 +7,11 @@
     </ol>
 </nav>
 
-<div class="container mt-2">
-    <div class="row align-items-center">
-        <div class="col-md-6 px-0">
-            <!-- Label for the select dropdown -->
-            <label for="rating" class="form-label mb-0">Select Rating:</label>
-            <!-- Bootstrap styled select dropdown -->
+<div class="container mt-2 grid-container">
+    <div class="filter-section pr-4">
+        <!-- Filter section content -->
+        <div class="form-group">
+            <label for="rating" class="form-label mb-0">เลือก Rating</label>
             <select id="rating" class="form-select mb-1">
                 <option value="">ALL</option>
                 <option value="5">5</option>
@@ -20,28 +19,88 @@
                 <option value="3">3</option>
                 <option value="2">2</option>
                 <option value="1">1</option>
-                <!-- Add more options as needed -->
             </select>
-            <label for="duration" class="form-label">Duration <output for="duration" id="durationOutput">0
+            <label for="duration" class="form-label">ระยะเวลา <output for="duration" id="durationOutput">0
                     minutes</output></label><br>
-            <input type="range" name="duration" id="duration" class="form-range mb-5" min="0" max="120" step="1"
-                style="width: 50%;" required>
+            <input type="range" name="duration" id="duration" class="form-range" min="0" max="120" step="1" required>
+            <div class="checkbox-container">
+                <input type="checkbox" id="easy" name="difficulty" value="easy">
+                <label for="easy">ง่าย</label>
+
+                <input type="checkbox" id="medium" name="difficulty" value="medium">
+                <label for="medium">ปานกลาง</label>
+
+                <input type="checkbox" id="hard" name="difficulty" value="hard">
+                <label for="hard">ยาก</label>
+            </div>
+            <div class="my-3">
+                <button id="clearFiltersBtn" class="btn btn-secondary">Clear Filters</button>
+            </div>
+        </div>
+    </div>
+    <div class="data-section">
+        <!-- Data section content -->
+        <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3" id="recipeList">
+            <!-- Recipe items will be dynamically added here -->
         </div>
     </div>
 </div>
 
-<div id="results"></div>
-
-<div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3" id="recipeList">
-    <!-- Recipe items will be dynamically added here -->
-</div>
 
 <div id="loadingOverlay" class="loading-overlay">
     <div class="spinner"></div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', fetchData);
+    const durationInput = document.getElementById('duration');
+    const durationOutput = document.getElementById('durationOutput');
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchData();
+        // Add event listeners to difficulty checkboxes
+        document.querySelectorAll('input[name="difficulty"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                fetchDataByDifficulty(checkbox.value);
+            });
+        });
+        document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+    });
+
+    function clearFilters() {
+        // Clear difficulty checkboxes
+        document.querySelectorAll('input[name="difficulty"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // Reset rating dropdown to default value
+        document.getElementById('rating').value = '';
+
+        // Reset duration range input to default value
+        document.getElementById('duration').value = 0;
+
+        durationOutput.textContent = `≈ 0 minutes`;
+
+        // Fetch all recipes again after clearing filters
+        fetchData();
+    }
+
+    // Fetch data based on selected difficulty checkboxes
+    async function fetchDataByDifficulty(difficulty) {
+        const selectedDifficulties = Array.from(document.querySelectorAll('input[name="difficulty"]:checked')).map(input => input.value);
+        try {
+            const response = await fetch('/filterByDifficulty', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ difficulty: selectedDifficulties })
+            });
+            const data = await response.json();
+            // Append new data to accumulated data
+            renderRecipes(data?.recipes); // Render accumulated data
+        } catch (error) {
+            console.error('Error fetching data by difficulty:', error);
+        }
+    }
 
     document.getElementById('rating').addEventListener('change', handleRatingChange);
 
@@ -113,13 +172,11 @@
         }
     }
 
-    const durationInput = document.getElementById('duration');
-    const durationOutput = document.getElementById('durationOutput');
 
     let timeoutId;
 
     durationInput.addEventListener('input', function () {
-        durationOutput.textContent = `${this.value} minutes`;
+        durationOutput.textContent = `≈ ${this.value} minutes`;
 
         // Clear the previous timeout
         clearTimeout(timeoutId);
@@ -150,6 +207,4 @@
                 });
         }, 1000); // 3 seconds
     });
-    // Initial fetch on page load
-    fetchData();
 </script>

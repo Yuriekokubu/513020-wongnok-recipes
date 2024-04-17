@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
         integrity="sha384-xeJqLiuOvjUBq3iGOjvSQSIlwrpqjSHXpduPd6rQpuiM3f5/ijby8pCsnbu5S81n" crossorigin="anonymous">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <!--Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://wongnok.s3.ap-east-1.amazonaws.com/public/css/styles.css">
+    <!-- <link rel="stylesheet" href="/css/styles.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,10 +60,6 @@
                 font-size: 0.8rem;
                 /* Adjust as needed */
             }
-        }
-
-        #rating {
-            width: 25%;
         }
 
         .container {
@@ -110,6 +106,24 @@
                 transform: rotate(360deg);
             }
         }
+
+        .dark-mode input[type="range"] {
+            background-color: transparent;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            /* Make the filter section take up auto width and data section take up remaining space */
+            gap: 50px;
+            /* Add gap between filter and data sections */
+        }
+
+        .filter-section {
+            /* Styles for the filter section */
+            grid-column: 1;
+            /* Expand the filter section to span across both columns */
+        }
     </style>
 </head>
 
@@ -117,7 +131,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/img/wongnok.png" alt="Cooking Blog"
+                <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/img/wongbok_rm_bg.png" alt="Cooking Blog"
                     width="229" height="68">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -141,8 +155,14 @@
                     <input type="text" placeholder="ค้นหาสูตร..." name="searchTerm" class="form-control me-2"
                         aria-label="Search">
                 </form>
+
                 <% if(userName){ %>
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <div class="btn-group" role="group" aria-label="Dark/Bright Mode Buttons">
+                            <button type="button" class="btn circular-btn" id="modeToggleBtn">
+                                <i class="bi bi-sun"></i>
+                            </button>
+                        </div>
                         <li class="nav-item">
                             <div class="dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown"
@@ -169,6 +189,11 @@
                     </ul>
                     <% } else { %>
                         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <div class="btn-group" role="group" aria-label="Dark/Bright Mode Buttons">
+                                <button type="button" class="btn circular-btn" id="modeToggleBtn">
+                                    <i class="bi bi-sun"></i>
+                                </button>
+                            </div>
                             <li class="nav-item">
                                 <a class="nav-link" href="/submit-recipe">Submit</a>
                             </li>
@@ -181,7 +206,7 @@
         </div>
     </nav>
 
-    <div class="container-xxl px-md-5 bg-white shadow-lg">
+    <div class="container-xxl px-md-5 bg-white shadow-lg" style="min-height: 100vh;">
         <main>
             <%- body -%>
         </main>
@@ -194,7 +219,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-    <script src="https://wongnok.s3.ap-east-1.amazonaws.com/public/js/script.js"></script>
+    <script src="https://wongnok.s3.ap-east-1.amazonaws.com/public/js/script2.js"></script>
+    <!-- <script src="/js/script.js"></script> -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var searchForm = document.getElementById('searchForm');
@@ -224,8 +250,6 @@
                 }
             });
         });
-
-
     </script>
 </body>
 

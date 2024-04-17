@@ -72,17 +72,30 @@
 
 
                 <div class="col-12">
-                  <label for="category">Select Category</label>
+                  <label for="category">Category</label>
                   <select class="form-select form-control" name="category" aria-label="Category" required>
                     <option selected>Select Category</option>
                     <option value="Thai">Thai</option>
                     <option value="American">American</option>
-                    <option value="Chineese">Chineese</option>
+                    <option value="Chinese">Chinese</option>
                     <option value="Mexican">Mexican</option>
                     <option value="Indian">Indian</option>
                     <option value="Indian">Italian</option>
                   </select>
                 </div>
+
+                <div class="col-12">
+                  <label for="cookingDifficulty">Difficulty</label>
+                  <select class="form-select form-control" name="difficulty" aria-label="Difficulty" required>
+                    <option selected>Select Difficulty</option>
+                    <% difficultyEnumValues.forEach(function(difficulty) { %>
+                      <option value="<%= difficulty %>">
+                        <%= difficulty %>
+                      </option>
+                      <% }); %>
+                  </select>
+                </div>
+
 
                 <div class="col-12">
                   <label for="image">Product Image</label>
@@ -111,4 +124,5 @@
 
   // Initialize the output value with the initial slider value
   durationOutput.textContent = durationInput.value + ' minutes';
+  
 </script>

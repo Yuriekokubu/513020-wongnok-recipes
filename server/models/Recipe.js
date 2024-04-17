@@ -25,7 +25,7 @@ const recipeSchema = new mongoose.Schema(
 		},
 		category: {
 			type: String,
-			enum: ["Thai", "American", "Chineese", "Indian", "Mexican", "Italian"],
+			enum: ["Thai", "American", "Chinese", "Indian", "Mexican", "Italian"],
 			required: "This field is required",
 		},
 		duration: {
@@ -37,7 +37,7 @@ const recipeSchema = new mongoose.Schema(
 			required: "This field is required",
 		},
 		user: {
-			type: ObjectId,
+			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
 		},
@@ -64,6 +64,11 @@ const recipeSchema = new mongoose.Schema(
 			type: Number,
 			default: 0,
 		},
+		difficulty: {
+			type: String,
+			enum: ["easy", "medium", "hard"],
+			required: true,
+		},
 	},
 	{ timestamps: true }
 );
@@ -86,5 +91,8 @@ recipeSchema.pre("save", async function (next) {
 		next(error);
 	}
 });
-
-module.exports = mongoose.model("Recipe", recipeSchema);
+const difficultyEnumValues = recipeSchema.path("difficulty").enumValues;
+module.exports = {
+	Recipe: mongoose.model("Recipe", recipeSchema),
+	difficultyEnumValues: difficultyEnumValues,
+};

@@ -4,7 +4,7 @@
  */
 
 const Category = require("../models/Category");
-const Recipe = require("../models/Recipe");
+const { Recipe, difficultyEnumValues } = require("../models/Recipe");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -34,13 +34,13 @@ exports = module.exports.homepage = async (req, res) => {
 		const latest = await Recipe.find({}).sort({ _id: -1 }).limit(limitNumber);
 
 		const thai = await Recipe.find({ category: "Thai" }).limit(limitNumber);
-		const chineese = await Recipe.find({ category: "Chineese" }).limit(limitNumber);
+		const chinese = await Recipe.find({ category: "Chinese" }).limit(limitNumber);
 		const mexico = await Recipe.find({ category: "Mexico" }).limit(limitNumber);
 		const indian = await Recipe.find({ category: "Indian" }).limit(limitNumber);
 		const italian = await Recipe.find({ category: "Italian" }).limit(limitNumber);
 		const american = await Recipe.find({ category: "American" }).limit(limitNumber);
 
-		const food = { latest, thai, chineese, indian, mexico, italian, american };
+		const food = { latest, thai, chinese, indian, mexico, italian, american };
 		res.render("index", { title: "Wongnok Recipe - Home", categories, food, userId, userName });
 	} catch (error) {
 		res.status(500).send({ message: error.message || "Error Occured" });
@@ -87,7 +87,7 @@ exports = module.exports.homepage = async (req, res) => {
 //                     "description": "Chilli chicken is a popular Indo-chinese appetizer made by tossing fried chicken in spicy hot chilli sauce.",
 //                     "email": "n.anchusree@gmail.com",
 //                     "ingredients": ["Chicken", "Ginger", "Garlic", "Lemon juice", "Onion", "Capsicum", "Salt"],
-//                     "category": "Chineese",
+//                     "category": "Chinese",
 //                     "image": "chilly_ckn_1.jpeg"
 //                 },
 //                 {
@@ -148,7 +148,7 @@ exports = module.exports.exploreCategoriesById = async (req, res) => {
 module.exports.exploreRecipes = async (req, res) => {
 	try {
 		let recipeId = req.params.id;
-		const recipe = await Recipe.findById(recipeId);
+		const recipe = await Recipe.findById(recipeId).populate("user", "name");
 
 		// Calculate the total number of raters
 		const totalRaters = recipe.ratings.length;
@@ -211,7 +211,7 @@ exports = module.exports.submitRecipe = async (req, res) => {
 	try {
 		const infoErrorsObj = req.flash("infoErrors");
 		const infoSubmitObj = req.flash("infoSubmit");
-		res.render("submit-recipe", { title: "Cooking Blog - Submit Recipe", infoErrorsObj, infoSubmitObj });
+		res.render("submit-recipe", { title: "Cooking Blog - Submit Recipe", infoErrorsObj, infoSubmitObj, difficultyEnumValues });
 	} catch (err) {
 		res.status(500).send({ message: err.message || "Error Occured" });
 	}
@@ -249,9 +249,8 @@ exports = module.exports.submitRecipePost = async (req, res) => {
 			duration: req.body.duration,
 			image: newImageName.substring("public/uploads/".length),
 			user: req.session.userId,
+			difficulty: req.body.difficulty,
 		});
-
-		console.log(newRecipe);
 
 		// Save the new recipe object
 		await newRecipe.save();
@@ -365,7 +364,6 @@ module.exports.userProfile = (req, res) => {
 				if (recipe) {
 					count = recipe.length;
 				}
-				console.log(recipe);
 				res.render("userProfile", { user, count, recipe });
 			} else {
 				// req.flash('infoErrors', "Something went wrong")
@@ -416,7 +414,6 @@ exports = module.exports.viewRecipe = async (req, res) => {
 	try {
 		const recipe_id = req.params.id;
 		const recipeItem = await Recipe.find({ _id: recipe_id });
-		console.log(recipeItem);
 		res.json({ status: true, result: recipeItem });
 	} catch (err) {
 		res.status(500).send({ message: err.message || "Error Occured" });
@@ -428,7 +425,6 @@ module.exports.editRecipes = async (req, res) => {
 	const recipeItem = await Recipe.findById(recipe_id); // Use findById directly since you are querying by ID
 
 	let ingredientsArray;
-
 	// Check if a new image file was uploaded
 	let newImageName;
 	if (req.files && req.files.image) {
@@ -450,7 +446,8 @@ module.exports.editRecipes = async (req, res) => {
 	if (req.body.ingredients) {
 		ingredientsArray = req.body.ingredients.split(",");
 	}
-	console.log(ingredientsArray);
+
+	console.log(req.body.duration);
 
 	// Prepare the update object with the fields that need to be updated
 	const updateObj = {
@@ -546,7 +543,7 @@ module.exports.filterRating = async (req, res) => {
 					},
 				},
 			},
-			{ $match: { averageRating: { $eq: roundedRating } } },
+			{ $match: { averageRating: { $gte: ratingValue, $lt: ratingValue + 1 } } },
 		]);
 		res.json(filteredResults);
 	} catch (err) {
@@ -566,10 +563,23 @@ module.exports.FindDuration = async (req, res) => {
 				$match: { duration: { $gte: minDuration, $lt: maxDuration } }, // Match documents where the duration falls within the specified range
 			},
 		]);
-
 		res.json(filteredResults);
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: "Internal Server Error" });
+	}
+};
+
+module.exports.FilterByDifficulty = async (req, res) => {
+	const diffParams = req.body.difficulty;
+	try {
+		// Find recipes with the specified difficulty
+		const recipes = await Recipe.find({ difficulty: diffParams });
+		// Return the filtered recipes
+		res.status(200).json({ success: true, recipes });
+	} catch (error) {
+		// Handle any errors
+		console.error("Error filtering recipes by difficulty:", error);
+		res.status(500).json({ success: false, message: "Internal server error" });
 	}
 };

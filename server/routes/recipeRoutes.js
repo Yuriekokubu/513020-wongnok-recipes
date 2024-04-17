@@ -51,6 +51,8 @@ recipeRouter.get("/filterByRating/:minRating", recipeController.filterRating);
 
 recipeRouter.post("/filterByDuration/:duration", recipeController.FindDuration);
 
+recipeRouter.post("/filterByDifficulty", recipeController.FilterByDifficulty);
+
 //log out
 recipeRouter.get("/logout", (req, res) => {
 	req.session.destroy();

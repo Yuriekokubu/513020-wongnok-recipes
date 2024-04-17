@@ -44,6 +44,7 @@ require("./server/models/Recipe");
 require("./server/models/User");
 
 // Serve static files from Amazon S3 bucket
+// app.use(express.static("public"));
 app.use("/public", express.static("https://wongnok.s3.ap-east-1.amazonaws.com"));
 
 app.listen(port, "0.0.0.0", () => {

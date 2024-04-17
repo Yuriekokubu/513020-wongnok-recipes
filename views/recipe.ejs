@@ -9,15 +9,49 @@
             </li>
         </ol>
     </nav>
+    <!-- Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img src="" id="modalImage" class="img-fluid" alt="Large Recipe Image">
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
-        <div class="col-12 col-md-4">
-            <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%- recipe.image %>" style="top: 20px;"
-                alt="<%- recipe.image %>" class="img-fluid sticky-top" loading="lazy">
+        <div class="col-12 col-md-4 mb-3">
+            <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%- recipe.image %>"
+                class="img-fluid recipe-image" alt="Recipe Image" style="max-width: 100%; max-height: 100%;">
             <span>
-                <i class="bi bi-clock"></i>
-                <span>
-                    <%= recipe.duration %>
-                </span>
+                <% if (recipe.duration) { %>
+                    <span>
+                        ⏳
+                        ระยะเวลาในการทำ <%= recipe.duration %> นาที
+                    </span>
+                    <% } else { %>
+                        <span>
+                            ""
+                        </span>
+                        <% } %>
+            </span>
+            <br>
+            <span>
+                <% if (recipe.difficulty) { %>
+                    <span>
+                        🧑🏼‍🍳 ระดับความยาก :
+                        <% if (recipe.difficulty==='easy' ) { %>
+                            ง่าย
+                            <% } else if (recipe.difficulty==='medium' ) { %>
+                                ปานกลาง
+                                <% } else if (recipe.difficulty==='hard' ) { %>
+                                    ยาก
+                                    <% } %>
+                    </span>
+                    <% } else { %>
+                        <span>
+                        </span>
+                        <% } %>
             </span>
         </div>
 
@@ -26,13 +60,25 @@
                 <div class="col-12">
                     <h3>
                         <%= recipe.name %>
+
                     </h3>
 
                     <div class="col-12 mb-4">
-                        <i class="bi bi-tag"></i>
-                        <%- recipe.category %>
-                            <br> <br>
-                            <%- recipe.description %>
+                        <span class="badge bg-primary">
+                            <i class="bi bi-tag"></i>
+                            <a href="/categories/<%- recipe.category %>" style="text-decoration: none; color: inherit">
+                                <%- recipe.category %>
+                            </a>
+                        </span>
+                        <br>
+                        <% if (recipe.user && recipe.user.name) { %>
+                            เผยแพร่โดย :
+                            <a href=" #" class="badge bg-success">
+                                <%= recipe.user.name %>
+                            </a>
+                            <% } %>
+                                <br> <br>
+                                <%- recipe.description %>
                     </div>
 
                     <div class="star-rating" data-rating="<%= averageRating %>">
@@ -56,18 +102,18 @@
                     </div>
                 </div>
 
-                <div class="col-12 my-2">
-                    <h4>Ingredients</h4>
+                <div class="col-12 mt-3">
+                    <h4>📝Ingredients</h4>
                     <ul class="list-group list-group-flush">
                         <% recipe.ingredients.forEach(function(ingredient,index){ %>
                             <li class="list-group-item">
-                                <%= ingredient %>
+                                🔷 <%= ingredient %>
                             </li>
                             <% }) %>
                     </ul>
                 </div>
                 <div class="col-12" style="white-space: pre-line;">
-                    <h4>Cooking Instructions</h4>
+                    <h4>🍳Cooking Instructions</h4>
                     <%- recipe.instructions %>
                 </div>
             </div>
@@ -137,6 +183,19 @@
                     $('.star-rating').on('mouseleave', function () {
                         $('.star').html('<i class="far fa-star"></i>'); // Reset all stars to empty
                         $('.star:lt(' + ratingValue + ')').html('<i class="fas fa-star"></i>'); // Fill stars up to the previously hovered one
+                    });
+                });
+
+                document.querySelectorAll('.recipe-image').forEach(function (image) {
+                    image.addEventListener('click', function () {
+                        // Get the image source
+                        var imageUrl = this.src;
+
+                        // Update the modal image source
+                        document.getElementById('modalImage').src = imageUrl;
+
+                        // Show the modal
+                        $('#imageModal').modal('show');
                     });
                 });
             </script>

@@ -30,9 +30,9 @@ I'm a Full Stack Developer PASSINATE about Javascript and React....
 
 ## Screenshots
 
-![App Screenshot](https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/prev1.webp)
+![App Screenshot](https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/prev3.webp)
 
-![App Screenshot](https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/prev2.webp)
+![App Screenshot](https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/prev.webp)
 
 
 ## Tech Stack

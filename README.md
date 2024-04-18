@@ -64,3 +64,6 @@ To run this project, you will need to add the following environment variables to
 
 `AWS_SECRET_ACCESS_KEY`=
 
+## API
+
+[Checkout for My APIs](https://github.com/Yuriekokubu/513020-wongnok-recipes/blob/master/wongnok.postman_collection.json)

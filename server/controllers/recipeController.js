@@ -1,28 +1,13 @@
-/**
- * GET /
- * homepage
- */
-
 const Category = require("../models/Category");
 const { Recipe, difficultyEnumValues } = require("../models/Recipe");
+const { fetchCategories } = require("./categoryController");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { ObjectId } = require("mongodb");
-const AWS = require("aws-sdk");
-const fs = require("fs");
 const env = require("dotenv");
+const { uploadFileToS3 } = require("../service/s3Service");
 env.config();
-
-// Set the region and access keys
-AWS.config.update({
-	region: "ap-east-1",
-	accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-});
-
-// Create a new instance of the S3 class
-const s3 = new AWS.S3();
 
 exports = module.exports.homepage = async (req, res) => {
 	try {
@@ -46,82 +31,6 @@ exports = module.exports.homepage = async (req, res) => {
 		res.status(500).send({ message: error.message || "Error Occured" });
 	}
 };
-// async function insertDummyData(){
-//   try{
-//     await Category.insertMany(
-//         [
-//             {
-//                 "name":"Thai",
-//                 "image":"pad_thai_1.jpeg"
-//             },
-//             {
-//                 "name":"Italian",
-//                 "image":"pizza_1.jpeg"
-//             },
-//             {
-//                 "name":"Indian",
-//                 "image":"mutton_kurma_1.jpeg"
-//             },
-//             {
-//                 "name":"Mexican",
-//                 "image":"mexican_shwarma_1.jpeg"
-//             },
-//             {
-//                 "name":"Thai",
-//                 "image":"mango sticky rice_2.jpeg"
-//             },
-//         ]
-//         )
-//   }
-//   catch(error){
-//     console.log("error",error);
-//   }
-// }
-// insertDummyData()
-// async function insertDummyRecipeData() {
-//     try {
-//         await Recipe.insertMany(
-//             [
-//                 {
-//                     "name": "Chilly Chicken",
-//                     "description": "Chilli chicken is a popular Indo-chinese appetizer made by tossing fried chicken in spicy hot chilli sauce.",
-//                     "email": "n.anchusree@gmail.com",
-//                     "ingredients": ["Chicken", "Ginger", "Garlic", "Lemon juice", "Onion", "Capsicum", "Salt"],
-//                     "category": "Chinese",
-//                     "image": "chilly_ckn_1.jpeg"
-//                 },
-//                 {
-//                     "name": "Mango Sticky Rice",
-//                     "description":"Mango sticky rice is a traditional Southeast Asian and South Asian dessert made with glutinous rice, fresh mango and coconut milk, and eaten with a spoon or the hands.",
-//                     "email": "aleena@gmail.com",
-//                     "ingredients": ["Glutinous (sweet) rice", "Coconut milk", "Sugar", "Sesame Seeds", "Mango", "Salt"],
-//                     "category": "Mexican",
-//                     "image": "mango sticky rice_2.jpeg"
-//                 },
-//                 {
-//                     "name": "Mexican Shawarma",
-//                     "description": "Shawarma is marinated with various seasonings and spices such as cumin, turmeric, and paprika. It is made by stacking thinly sliced meat, typically lamb, beef, or chicken, on a large rotating skewer or cone. It is also sometimes cooked with extra fat from the meat to give it a juicer taste.",
-//                     "email": "anchu@gmail.com",
-//                     "ingredients": ["Chicken", "Shawarma bread", "Cabbage", "Carrots",,"Cucumber", "Onion", "Capsicum", "Salt"],
-//                     "category": "Mexican",
-//                     "image": "mexican_shwarma_3.jpeg"
-//                 },
-//                 {
-//                     "name": "Pizza",
-//                     "description": "Pizza is a dish of Italian origin consisting of a usually round, flat base of leavened wheat-based dough topped with various ingredients",
-//                     "email": "shreya@gmail.com",
-//                     "ingredients": ["Chicken","Cheese","Olive", "Onion", "Capsicum","Yeast", "Salt","Sugar","Oregano"],
-//                     "category": "Italian",
-//                     "image": "pizza_3.jpeg"
-//                 }
-//             ]
-//         )
-//     }
-//     catch (error) {
-//         console.log("error", error);
-//     }
-// }
-//insertDummyRecipeData()
 
 exports = module.exports.exploreCategories = async (req, res) => {
 	try {
@@ -211,32 +120,21 @@ exports = module.exports.submitRecipe = async (req, res) => {
 	try {
 		const infoErrorsObj = req.flash("infoErrors");
 		const infoSubmitObj = req.flash("infoSubmit");
-		res.render("submit-recipe", { title: "Cooking Blog - Submit Recipe", infoErrorsObj, infoSubmitObj, difficultyEnumValues });
+		const categories = await fetchCategories();
+		res.render("submit-recipe", { title: "Cooking Blog - Submit Recipe", infoErrorsObj, infoSubmitObj, difficultyEnumValues, categories });
 	} catch (err) {
 		res.status(500).send({ message: err.message || "Error Occured" });
 	}
 };
 exports = module.exports.submitRecipePost = async (req, res) => {
 	try {
-		let imageUploadFile;
 		let newImageName;
 
 		if (!req.files || Object.keys(req.files).length === 0) {
 			console.log("No Files were uploaded.");
 		} else {
-			imageUploadFile = req.files.image;
-			newImageName = "public/uploads/" + Date.now() + "_" + imageUploadFile.name;
-
-			// Set the parameters for the file upload to S3
-			const uploadParams = {
-				Bucket: "wongnok",
-				Key: newImageName,
-				Body: imageUploadFile.data, // Use the file buffer directly
-			};
-
-			// Upload the file to S3
-			const s3UploadResponse = await s3.upload(uploadParams).promise();
-			console.log("File uploaded successfully. File location:", s3UploadResponse.Location);
+			const imageUploadFile = req.files.image;
+			newImageName = await uploadFileToS3(imageUploadFile, `public/uploads/${Date.now()}_${imageUploadFile.name}`);
 		}
 
 		// Create a new recipe object
@@ -247,7 +145,7 @@ exports = module.exports.submitRecipePost = async (req, res) => {
 			ingredients: req.body.ingredients,
 			category: req.body.category,
 			duration: req.body.duration,
-			image: newImageName.substring("public/uploads/".length),
+			image: newImageName,
 			user: req.session.userId,
 			difficulty: req.body.difficulty,
 		});
@@ -364,7 +262,8 @@ module.exports.userProfile = (req, res) => {
 				if (recipe) {
 					count = recipe.length;
 				}
-				res.render("userProfile", { user, count, recipe });
+				const categories = await Category.find({}).exec();
+				res.render("userProfile", { user, count, recipe, difficultyEnumValues, categories });
 			} else {
 				// req.flash('infoErrors', "Something went wrong")
 				console.log(error);
@@ -378,29 +277,17 @@ module.exports.userProfile = (req, res) => {
 
 module.exports.Profile = async (req, res) => {
 	try {
-		let imageUploadFile;
 		let newImageName;
 
 		if (!req.files || Object.keys(req.files).length === 0) {
 			console.log("No Files were uploaded.");
 		} else {
-			imageUploadFile = req.files.image;
-			newImageName = "public/uploads/" + Date.now() + "_" + imageUploadFile.name; // Add timestamp prefix to filename
-
-			// Set the parameters for the file upload to S3
-			const uploadParams = {
-				Bucket: "wongnok",
-				Key: newImageName,
-				Body: imageUploadFile.data, // Use the file buffer directly
-			};
-
-			// Upload the file to S3
-			const s3UploadResponse = await s3.upload(uploadParams).promise();
-			console.log("File uploaded successfully. File location:", s3UploadResponse.Location);
+			const imageUploadFile = req.files.image;
+			newImageName = await uploadFileToS3(imageUploadFile, `public/uploads/${Date.now()}_${imageUploadFile.name}`);
 		}
 
 		// Update the user's profile with the new image name
-		await User.updateOne({ _id: ObjectId(req.session.userId) }, { $set: { image: newImageName.substring("public/uploads/".length) } }, { upsert: true });
+		await User.updateOne({ _id: ObjectId(req.session.userId) }, { $set: { image: newImageName } }, { upsert: true });
 
 		res.redirect("/profile");
 	} catch (error) {
@@ -423,31 +310,19 @@ exports = module.exports.viewRecipe = async (req, res) => {
 module.exports.editRecipes = async (req, res) => {
 	const recipe_id = req.params.id;
 	const recipeItem = await Recipe.findById(recipe_id); // Use findById directly since you are querying by ID
-
 	let ingredientsArray;
 	// Check if a new image file was uploaded
 	let newImageName;
-	if (req.files && req.files.image) {
+	if (!req.files || Object.keys(req.files).length === 0) {
+		console.log("No Files were uploaded.");
+	} else {
 		const imageUploadFile = req.files.image;
-		newImageName = "public/uploads/" + Date.now() + "_" + imageUploadFile.name;
-
-		// Set the parameters for the file upload to S3
-		const uploadParams = {
-			Bucket: "wongnok",
-			Key: newImageName,
-			Body: imageUploadFile.data, // Use the file buffer directly
-		};
-
-		// Upload the file to S3
-		const s3UploadResponse = await s3.upload(uploadParams).promise();
-		console.log("File uploaded successfully. File location:", s3UploadResponse.Location);
+		newImageName = await uploadFileToS3(imageUploadFile, `public/uploads/${Date.now()}_${imageUploadFile.name}`);
 	}
 
 	if (req.body.ingredients) {
 		ingredientsArray = req.body.ingredients.split(",");
 	}
-
-	console.log(req.body.duration);
 
 	// Prepare the update object with the fields that need to be updated
 	const updateObj = {
@@ -457,11 +332,12 @@ module.exports.editRecipes = async (req, res) => {
 		ingredients: req.body.ingredients ? ingredientsArray : recipeItem.ingredients,
 		category: req.body.category || recipeItem.category,
 		duration: req.body.duration || recipeItem.duration,
+		difficulty: req.body.difficulty || recipeItem.duration,
 	};
 
 	// Only update the image field if a new image was uploaded
 	if (newImageName) {
-		updateObj.image = newImageName.substring("public/uploads/".length);
+		updateObj.image = newImageName;
 	}
 
 	// Update the recipe using findByIdAndUpdate
@@ -481,37 +357,40 @@ module.exports.deleteRecipe = async (req, res) => {
 
 module.exports.rating = async (req, res) => {
 	try {
-		let recipeId = req.params.recipeId;
-		let userId = req.session.userId;
-		let ratingValue = req.body.ratingValue;
+        let recipeId = req.params.recipeId;
+        let userId = req.session.userId;
+        let ratingValue = req.body.ratingValue;
 
-		// Check if the user is the owner of the recipe
-		const recipe = await Recipe.findById(recipeId);
-		if (recipe.user.equals(userId)) {
-			req.flash("infoErrors", "User already registered");
-			return res.status(400).send("You cannot rate your own recipe");
-		}
+        // Check if the user is the owner of the recipe
+        const recipe = await Recipe.findById(recipeId);
+        if (recipe.user.equals(userId)) {
+            return res.status(400).json({ error: "You cannot rate your own recipe" });
+        }
 
-		// Check if the user has already rated the recipe
-		const existingRating = recipe.ratings.find((rating) => rating.user.equals(userId));
-		if (existingRating) {
-			return res.status(400).send("You have already rated this recipe");
-		}
+        // Check if the user has already rated the recipe
+        const existingRating = recipe.ratings.find((rating) => rating.user.equals(userId));
+        if (existingRating) {
+            return res.status(400).json({ error: "You have already rated this recipe" });
+        }
 
-		// Add rating to the recipe
-		await Recipe.findOneAndUpdate({ _id: recipeId }, { $addToSet: { ratings: { user: userId, value: ratingValue } } }, { upsert: true, new: true });
+        // Add rating to the recipe
+        await Recipe.findOneAndUpdate(
+            { _id: recipeId },
+            { $addToSet: { ratings: { user: userId, value: ratingValue } } },
+            { upsert: true, new: true }
+        );
 
-		// Get the updated recipe with the latest ratings
-		const updatedRecipe = await Recipe.findById(recipeId);
-		const latestRatingScore = calculateAverageRating(updatedRecipe.ratings);
-		const totalVoters = updatedRecipe.ratings.length;
+        // Get the updated recipe with the latest ratings
+        const updatedRecipe = await Recipe.findById(recipeId);
+        const latestRatingScore = calculateAverageRating(updatedRecipe.ratings);
+        const totalVoters = updatedRecipe.ratings.length;
 
-		// Send the latest rating score to the client
-		res.status(200).json({ message: "Rating added successfully", latestRating: latestRatingScore, totalVoters: totalVoters });
-	} catch (error) {
-		console.error("Error adding rating:", error);
-		res.status(500).send("Error adding rating");
-	}
+        // Send the latest rating score to the client
+        res.status(200).json({ message: "Rating added successfully", latestRating: latestRatingScore, totalVoters: totalVoters });
+    } catch (error) {
+        console.error("Error adding rating:", error);
+        res.status(500).json({ error: "Error adding rating" });
+    }
 };
 
 function calculateAverageRating(ratings) {

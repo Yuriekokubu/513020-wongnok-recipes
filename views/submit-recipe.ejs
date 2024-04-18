@@ -1,4 +1,4 @@
-<div class="px-4 py-5 my-5 text-center">
+<div class="px-4 py-5 text-center">
   <h1 class="display-5 fw-bold">Submit Your Recipe</h1>
   <div class="col-lg-6 mx-auto">
     <p class="lead">Share your amazing recipies with thousands of web developers accross the world. Fill our form to get
@@ -70,17 +70,15 @@
                   <output for="duration" id="durationOutput">0 minutes</output>
                 </div>
 
-
                 <div class="col-12">
                   <label for="category">Category</label>
                   <select class="form-select form-control" name="category" aria-label="Category" required>
                     <option selected>Select Category</option>
-                    <option value="Thai">Thai</option>
-                    <option value="American">American</option>
-                    <option value="Chinese">Chinese</option>
-                    <option value="Mexican">Mexican</option>
-                    <option value="Indian">Indian</option>
-                    <option value="Indian">Italian</option>
+                    <% categories.forEach(category=> { %>
+                      <option value="<%= category.name %>">
+                        <%= category.name %>
+                      </option>
+                      <% }); %>
                   </select>
                 </div>
 
@@ -124,5 +122,5 @@
 
   // Initialize the output value with the initial slider value
   durationOutput.textContent = durationInput.value + ' minutes';
-  
+
 </script>

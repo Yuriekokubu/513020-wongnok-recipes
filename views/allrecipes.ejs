@@ -8,40 +8,49 @@
 </nav>
 
 <div class="container mt-2 grid-container">
-    <div class="filter-section pr-4">
-        <!-- Filter section content -->
-        <div class="form-group">
-            <label for="rating" class="form-label mb-0">เลือก Rating</label>
-            <select id="rating" class="form-select mb-1">
-                <option value="">ALL</option>
-                <option value="5">5</option>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
-                <option value="1">1</option>
-            </select>
-            <label for="duration" class="form-label">ระยะเวลา <output for="duration" id="durationOutput">0
-                    minutes</output></label><br>
-            <input type="range" name="duration" id="duration" class="form-range" min="0" max="120" step="1" required>
-            <div class="checkbox-container">
-                <input type="checkbox" id="easy" name="difficulty" value="easy">
-                <label for="easy">ง่าย</label>
+    <div class="row">
+        <!-- Filter section -->
+        <div class="col-lg-3 order-lg-1">
+            <div class="filter-section pr-4">
+                <!-- Filter section content -->
+                <div class="form-group">
+                    <label for="rating" class="form-label mb-0">เลือก Rating</label>
+                    <select id="rating" class="form-select mb-1">
+                        <option value="">ALL</option>
+                        <option value="5">5</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1</option>
+                    </select>
+                    <label for="duration" class="form-label">ระยะเวลา <output for="duration" id="durationOutput">0
+                            minutes</output></label><br>
+                    <input type="range" name="duration" id="duration" class="form-range" min="0" max="120" step="1"
+                        required>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="easy" name="difficulty" value="easy">
+                        <label for="easy">ง่าย</label>
 
-                <input type="checkbox" id="medium" name="difficulty" value="medium">
-                <label for="medium">ปานกลาง</label>
+                        <input type="checkbox" id="medium" name="difficulty" value="medium">
+                        <label for="medium">ปานกลาง</label>
 
-                <input type="checkbox" id="hard" name="difficulty" value="hard">
-                <label for="hard">ยาก</label>
-            </div>
-            <div class="my-3">
-                <button id="clearFiltersBtn" class="btn btn-secondary">Clear Filters</button>
+                        <input type="checkbox" id="hard" name="difficulty" value="hard">
+                        <label for="hard">ยาก</label>
+                    </div>
+                    <div class="my-3">
+                        <button id="clearFiltersBtn" class="btn btn-secondary">Clear Filters</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="data-section">
-        <!-- Data section content -->
-        <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3" id="recipeList">
-            <!-- Recipe items will be dynamically added here -->
+        <!-- Data section -->
+        <div class="col-lg-9 order-lg-2">
+            <div class="data-section">
+                <!-- Data section content -->
+                <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3" id="recipeList">
+                    <!-- Recipe items will be dynamically added here -->
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -171,7 +180,6 @@
             recipeList.innerHTML = '<p>No items found.</p>';
         }
     }
-
 
     let timeoutId;
 

@@ -92,7 +92,9 @@ recipeSchema.pre("save", async function (next) {
 	}
 });
 const difficultyEnumValues = recipeSchema.path("difficulty").enumValues;
+const categoryEnumValues = recipeSchema.path("category").enumValues;
 module.exports = {
 	Recipe: mongoose.model("Recipe", recipeSchema),
 	difficultyEnumValues: difficultyEnumValues,
+	categoryEnumValues,
 };

@@ -124,6 +124,20 @@
             grid-column: 1;
             /* Expand the filter section to span across both columns */
         }
+
+        .grid-container {
+            overflow-x: hidden;
+        }
+
+        @media (max-width: 991.98px) {
+            .filter-section {
+                order: 1;
+            }
+
+            .data-section {
+                order: 2;
+            }
+        }
     </style>
 </head>
 
@@ -157,12 +171,12 @@
                 </form>
 
                 <% if(userName){ %>
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <div class="btn-group" role="group" aria-label="Dark/Bright Mode Buttons">
-                            <button type="button" class="btn circular-btn" id="modeToggleBtn">
-                                <i class="bi bi-sun"></i>
-                            </button>
-                        </div>
+                    <div class="btn-group" role="group" aria-label="Dark/Bright Mode Buttons">
+                        <button type="button" class="btn circular-btn" id="modeToggleBtn">
+                            <i class="bi bi-sun"></i>
+                        </button>
+                    </div>
+                    <ul class="navbar-nav mb-2 mb-lg-0">
                         <li class="nav-item">
                             <div class="dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown"

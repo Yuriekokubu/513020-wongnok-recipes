@@ -204,37 +204,40 @@
                                                                                                     <select
                                                                                                         class="form-select form-control"
                                                                                                         name="category"
-                                                                                                        aria-label="Category"
-                                                                                                        value="<%= item.category %>">
-                                                                                                        <option
-                                                                                                            selected>
-                                                                                                            <%= item.category
-                                                                                                                %>
-                                                                                                        </option>
-                                                                                                        <option
-                                                                                                            value="Thai">
-                                                                                                            Thai
-                                                                                                        </option>
-                                                                                                        <option
-                                                                                                            value="American">
-                                                                                                            American
-                                                                                                        </option>
-                                                                                                        <option
-                                                                                                            value="Chinese">
-                                                                                                            Chinese
-                                                                                                        </option>
-                                                                                                        <option
-                                                                                                            value="Mexican">
-                                                                                                            Mexican
-                                                                                                        </option>
-                                                                                                        <option
-                                                                                                            value="Indian">
-                                                                                                            Indian
-                                                                                                        </option>
-                                                                                                        <option
-                                                                                                            value="Indian">
-                                                                                                            Italian
-                                                                                                        </option>
+                                                                                                        aria-label="Category">
+                                                                                                        <%
+                                                                                                            categories.forEach(category=>
+                                                                                                            { %>
+                                                                                                            <option
+                                                                                                                value="<%= category.name %>"
+                                                                                                                <%=item.category===category.name
+                                                                                                                ? 'selected'
+                                                                                                                : '' %>>
+                                                                                                                <%= category.name
+                                                                                                                    %>
+                                                                                                            </option>
+                                                                                                            <% }); %>
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                                <div class="col-12">
+                                                                                                    <label
+                                                                                                        for="difficulty">Difficulty</label>
+                                                                                                    <select
+                                                                                                        class="form-select form-control"
+                                                                                                        name="difficulty"
+                                                                                                        aria-label="Difficulty">
+                                                                                                        <%
+                                                                                                            difficultyEnumValues.forEach(diff=>
+                                                                                                            { %>
+                                                                                                            <option
+                                                                                                                value="<%= diff %>"
+                                                                                                                <%=diff===item.difficulty
+                                                                                                                ? 'selected'
+                                                                                                                : '' %>>
+                                                                                                                <%= diff
+                                                                                                                    %>
+                                                                                                            </option>
+                                                                                                            <% }); %>
                                                                                                     </select>
                                                                                                 </div>
                                                                                                 <div class="col-12">
@@ -421,7 +424,6 @@
                 }
             }
         });
-
     }
 
     const durationOutput = document.getElementById('durationOutput');

@@ -475,6 +475,8 @@
     function previewFile() {
         const preview = document.getElementById('previewImage');
         const fileInput = document.getElementById('imageInput');
+        const userImage = document.getElementById('userImage');
+        const userImageURL = "<%= userImageURL %>";
         const button = document.querySelector('.btn-primary'); // Select the upload button
         const file = fileInput.files[0];
         const reader = new FileReader();
@@ -483,6 +485,7 @@
             preview.src = reader.result;
         };
 
+        userImage.src = userImageURL;
         if (file) {
             reader.readAsDataURL(file);
         } else {

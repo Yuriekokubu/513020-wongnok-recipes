@@ -173,6 +173,7 @@
                 <% if(userName){ %>
                     <div class="btn-group" role="group" aria-label="Dark/Bright Mode Buttons">
                         <button type="button" class="btn circular-btn" id="modeToggleBtn">
+                            <i class="bi bi-sun"></i>
                         </button>
                     </div>
                     <ul class="navbar-nav mb-2 mb-lg-0">
@@ -182,7 +183,7 @@
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <% if(userImageURL){ %>
                                         <!-- User's circular avatar image -->
-                                        <img src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%= userImageURL %>"
+                                        <img id="userImage" src="https://wongnok.s3.ap-east-1.amazonaws.com/public/uploads/<%= userImageURL %>"
                                             alt="<%= userName %>'s Avatar" class="rounded-circle user-avatar" width="40"
                                             height="40">
                                         <% } else { %>

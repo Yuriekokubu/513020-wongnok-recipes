@@ -10,10 +10,12 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const rateLimitMiddleware = require("./middleware/rateLimitMiddleware");
-
 const mongoose = require("mongoose");
-const port = process.env.PORT || 3000;
 env.config();
+
+let port = process.env.PORT || 3000;
+
+let hostname = "0.0.0.0";
 
 app.use(express.urlencoded({ extended: true }));
 app.use(expressLayouts);
@@ -52,17 +54,22 @@ require("./server/models/User");
 // app.use(express.static("public"));
 app.use("/public", express.static("https://wongnok.s3.ap-east-1.amazonaws.com"));
 
-app.listen(port, "0.0.0.0", () => {
-	console.log(`Server running on port ${port}`);
-	mongoose
-		.connect(`${process.env.MONGOURI}`, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-		})
-		.then(() => {
-			console.log("Connected to MongoDB");
-		})
-		.catch((err) => {
-			console.error("Error connecting to MongoDB:", err);
+// Assuming other code remains the same before this point...
+
+mongoose
+	.connect(`${process.env.MONGOURI}`, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then(() => {
+		// console.log("Connected to MongoDB");
+
+		const server = app.listen(port, process.env.NODE_ENV === "production" ? hostname : undefined, () => {
+			console.log(`Server running on ${port}`);
 		});
-});
+	})
+	.catch((err) => {
+		console.error("Error connecting to MongoDB:", err);
+	});
+
+module.exports = app;

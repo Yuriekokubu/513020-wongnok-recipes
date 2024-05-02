@@ -1,12 +1,16 @@
-// test/rateLimit.test.js
-
+// rateLimit.test.js
 const request = require("supertest");
-const app = require("../app"); // Assuming your Express app is defined in app.js
+const app = require("../app");
 
 describe("Rate Limiting Middleware", () => {
 	it("should limit the number of requests per time interval", async () => {
-		// Send multiple requests to the API endpoint
-		const responsePromises = Array.from({ length: 110 }, () => request(app).get("/api/search"));
+		// Define the request body
+		const requestBody = {
+			searchTerm: "ตะ",
+		};
+
+		// Send multiple POST requests to the API endpoint with the request body
+		const responsePromises = Array.from({ length: 90 }, () => request(app).post("/api/search").send(requestBody));
 
 		// Wait for all requests to complete
 		const responses = await Promise.all(responsePromises);
@@ -24,3 +28,4 @@ describe("Rate Limiting Middleware", () => {
 		});
 	});
 });
+// jest --detectOpenHandles
